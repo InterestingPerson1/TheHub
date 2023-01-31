@@ -1,0 +1,66 @@
+local validIDs = {
+	["Splunker"] = true
+}
+  
+function loop(ia)
+	if ia == true then
+	  	rconsoleclear()
+	  	rconsoleprint('@@RED@@')
+	  	rconsoleprint('Invalid ID. Please type the ID of the script you wish to use below.\n-> ')
+	else
+		rconsoleclear()
+	  	rconsoleprint('@@GREEN@@')
+	  	rconsoleprint('Thanks for purchasing InterestingHub. Please type the ID of the script you wish to use below.\n-> ')
+	end
+  
+	local inp = rconsoleinput()
+	if validIDs[inp] ~= nil then
+		spawn(function()
+		  rconsoleclear()
+		  rconsoleprint('@@GREEN@@')
+		  rconsoleprint('Loading the script and closing console now...')
+		  task.wait(3)
+		  rconsoleclear()
+		end)
+  
+		local req2 = syn.request({
+			Url = ('https://hub-verify.glitch.me/script');
+		  	Headers = {
+				["key"] = inp,
+			};
+			Method = 'GET';
+		})
+		local body2 = game:GetService("HttpService"):JSONDecode(req2.Body)
+  
+		loadstring(body2.Script)()
+	else
+		loop(true)
+	end
+end
+  
+rconsoleclear()
+rconsolename("InterestingHub")
+
+local req1 = syn.request({
+	Url = ('https://hub-verify.glitch.me/ver');
+	Headers = {
+		["key"] = _G.Key,
+	};
+	Method = 'GET';
+})
+
+local body1 = game:GetService("HttpService"):JSONDecode(req1.Body)
+_G.FP = body1.Fingerprint
+
+if req1.StatusCode == 200 and body1.IsVerified == "true" then
+	if body1.wasFirstLoad == "true" then
+		rconsoleprint('@@GREEN@@')
+		rconsoleprint('This key is fresh! Your randomly generated uniqueid has been linked to this key, to prevent others from using it.')
+		task.wait(3)		
+	end
+  	loop()
+else
+	rconsoleclear()
+	rconsoleprint('@@RED@@')
+	rconsoleprint('Incorrect creditentials or you are not the owner of the key. Please retry.')
+end
